@@ -152,3 +152,56 @@ exports.replaceNote = async (req, res) => {
     });
   }
 };
+
+
+
+
+exports.updateNote = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // ✅ ID validation
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid ID",
+        data: null,
+      });
+    }
+
+    // ✅ Empty body check
+    if (Object.keys(req.body).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No fields provided to update",
+        data: null,
+      });
+    }
+
+    const note = await Note.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    // ✅ Not found
+    if (!note) {
+      return res.status(404).json({
+        success: false,
+        message: "Note not found",
+        data: null,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Note updated successfully",
+      data: note,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+      data: null,
+    });
+  }
+};
