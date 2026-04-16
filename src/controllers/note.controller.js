@@ -246,3 +246,38 @@ exports.deleteNote = async (req, res) => {
     });
   }
 };
+
+
+
+
+
+exports.deleteBulk = async (req, res) => {
+  try {
+    const { ids } = req.body;
+
+    // ✅ Check ids array
+    if (!ids || ids.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "IDs array is required",
+        data: null,
+      });
+    }
+
+    const result = await Note.deleteMany({
+      _id: { $in: ids },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: `${result.deletedCount} notes deleted successfully`,
+      data: null,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+      data: null,
+    });
+  }
+};
